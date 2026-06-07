@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Liste Courses</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    font-family: 'Sora', sans-serif;
+    color: #f1f5f9;
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+  }
+  ::-webkit-scrollbar { display: none; }
+
+  /* HEADER */
+  .header { padding: 32px 20px 0; }
+  .header-sub { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: #64748b; margin-bottom: 4px; }
+  .header-title { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; margin: 18px 20px 0; background: #1e293b; border-radius: 14px; padding: 4px; }
+  .tab {
+    flex: 1; padding: 10px 0; border-radius: 10px;
+    background: transparent; border: none; color: #64748b;
+    font-weight: 700; font-size: 13px; cursor: pointer;
+    font-family: 'Sora', sans-serif; transition: all 0.2s;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+  }
+  .tab-count {
+    margin-left: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px; padding: 1px 7px; font-size: 11px;
+  }
+  .tab:not(.active) .tab-count { background: #334155; }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 8px; padding: 14px 20px 8px; }
+  .btn {
+    flex: 1; padding: 12px 0; border: none; border-radius: 12px;
+    color: white; font-weight: 700; font-size: 13px; cursor: pointer;
+    font-family: 'Sora', sans-serif; transition: all 0.2s;
+  }
+  .btn-scan { background: linear-gradient(135deg, #10b981, #06b6d4); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+  .btn-scan.active { background: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.4); }
+  .btn-manual { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .btn-manual.active { background: #334155; }
+  .btn-clear { flex: 0; padding: 12px 14px; background: #334155; color: #fb7185; }
+
+  /* SCANNER */
+  #scanner-container {
+    margin: 0 20px 12px; border-radius: 16px; overflow: hidden;
+    position: relative; background: #000; display: none;
+  }
+  #scanner-container.visible { display: block; }
+  #scanner-container video { width: 100%; display: block; }
+  #scanner-container canvas { display: none; }
+  .scan-overlay {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center; pointer-events: none;
+  }
+  .scan-box {
+    width: 220px; height: 120px;
+    border: 3px solid #10b981; border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+  }
+  .scan-label {
+    position: absolute; bottom: 12px; left: 0; right: 0;
+    text-align: center; color: #10b981; font-weight: 600; font-size: 13px;
+  }
+  .scan-line {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 214px; height: 2px; background: #10b981;
+    animation: scanline 1.5s ease-in-out infinite;
+    opacity: 0.8;
+  }
+  @keyframes scanline {
+    0% { top: calc(50% - 57px); }
+    50% { top: calc(50% + 57px); }
+    100% { top: calc(50% - 57px); }
+  }
+
+  /* SCAN RESULT */
+  .scan-result {
+    margin: 0 20px 12px; background: #1e293b; border-radius: 16px; padding: 16px;
+    border: 1px solid #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.15);
+    display: none;
+  }
+  .scan-result.visible { display: block; }
+  .scan-result-sub { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+  .scan-result-name { font-weight: 700; font-size: 16px; }
+  .scan-result-cat { font-size: 12px; color: #10b981; margin-bottom: 12px; }
+  .scan-result-btns { display: flex; gap: 8px; }
+  .btn-add-scan {
+    flex: 1; padding: 10px 0;
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    border: none; border-radius: 10px; color: white;
+    font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Sora', sans-serif;
+  }
+  .btn-dismiss {
+    padding: 10px 16px; background: #334155;
+    border: none; border-radius: 10px; color: #94a3b8;
+    font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Sora', sans-serif;
+  }
+
+  /* MANUAL FORM */
+  .manual-form {
+    margin: 0 20px 12px; background: #1e293b; border-radius: 16px; padding: 16px;
+    display: none;
+  }
+  .manual-form.visible { display: block; }
+  .manual-form input, .manual-form select {
+    width: 100%; background: #0f172a; border: 1px solid #334155;
+    border-radius: 10px; padding: 11px 14px; color: white; font-size: 14px;
+    margin-bottom: 8px; outline: none; font-family: 'Sora', sans-serif;
+  }
+  .manual-form select option { background: #1e293b; }
+  .btn-add-manual {
+    width: 100%; padding: 12px 0;
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    border: none; border-radius: 10px; color: white;
+    font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Sora', sans-serif;
+  }
+
+  /* CATEGORY FILTER */
+  .cats {
+    display: flex; gap: 6px; padding: 4px 20px 12px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .cat-btn {
+    white-space: nowrap; padding: 6px 12px;
+    background: #1e293b; border: none; border-radius: 20px;
+    color: #64748b; font-weight: 600; font-size: 11px; cursor: pointer;
+    font-family: 'Sora', sans-serif; transition: all 0.15s;
+  }
+  .cat-btn.active { color: white; }
+
+  /* LIST */
+  .list { padding: 0 20px 140px; }
+  .empty {
+    text-align: center; padding: 60px 0; color: #334155;
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-title { font-weight: 600; font-size: 15px; }
+  .empty-sub { font-size: 13px; margin-top: 4px; color: #475569; }
+
+  .item {
+    display: flex; align-items: center; gap: 12px;
+    background: #1e293b; border-radius: 14px; padding: 13px 14px;
+    margin-bottom: 8px; border: 1px solid #334155; transition: all 0.2s;
+  }
+  .item.done { background: #0f172a; border-color: #1e293b; opacity: 0.5; }
+  .check-btn {
+    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+    background: transparent; border: 2px solid #475569;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px; transition: all 0.15s;
+  }
+  .check-btn.checked { background: #10b981; border-color: #10b981; }
+  .item-info { flex: 1; }
+  .item-name { font-weight: 600; font-size: 14px; }
+  .item.done .item-name { text-decoration: line-through; color: #475569; }
+  .item-cat { font-size: 11px; margin-top: 2px; font-weight: 600; }
+  .del-btn {
+    background: none; border: none; color: #475569;
+    font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;
+  }
+
+  /* BOTTOM BAR */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: linear-gradient(0deg, #0f172a 60%, transparent);
+    padding: 20px 20px 32px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .bottom-count-label { font-size: 11px; color: #64748b; font-weight: 600; }
+  .bottom-count { font-weight: 800; font-size: 24px; }
+  .bottom-count span { font-size: 13px; font-weight: 400; color: #64748b; margin-left: 6px; }
+  .btn-clear-done {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    border: none; border-radius: 12px; padding: 10px 16px;
+    color: white; font-weight: 700; font-size: 13px; cursor: pointer;
+    font-family: 'Sora', sans-serif;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: #10b981; color: white; padding: 10px 22px; border-radius: 50px;
+    font-weight: 600; font-size: 13px; z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: fadeDown 0.25s ease;
+    white-space: nowrap;
+  }
+  .toast.error { background: #ef4444; }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-sub">MES COURSES</div>
+  <div class="header-title">🛒 Liste Maison</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchMarket(0)">
+    Aldi <span class="tab-count" id="count-0">0</span>
+  </button>
+  <button class="tab" onclick="switchMarket(1)">
+    Colruyt <span class="tab-count" id="count-1">0</span>
+  </button>
+</div>
+
+<div class="actions">
+  <button class="btn btn-scan" id="btn-scan" onclick="toggleScan()">📷 Scanner</button>
+  <button class="btn btn-manual" id="btn-manual" onclick="toggleManual()">✏️ Manuel</button>
+  <button class="btn btn-clear" id="btn-clear" onclick="clearDone()" style="display:none">🗑️</button>
+</div>
+
+<div id="scanner-container">
+  <div id="interactive" class="viewport"></div>
+  <div class="scan-overlay">
+    <div style="position:relative">
+      <div class="scan-box"></div>
+      <div class="scan-line"></div>
+    </div>
+  </div>
+  <div class="scan-label">📦 Pointez le code-barres</div>
+</div>
+
+<div class="scan-result" id="scan-result">
+  <div class="scan-result-sub">Produit détecté</div>
+  <div class="scan-result-name" id="res-name"></div>
+  <div class="scan-result-cat" id="res-cat"></div>
+  <div class="scan-result-btns">
+    <button class="btn-add-scan" onclick="confirmScan()">✅ Ajouter</button>
+    <button class="btn-dismiss" onclick="dismissScan()">✕</button>
+  </div>
+</div>
+
+<div class="manual-form" id="manual-form">
+  <input type="text" id="manual-name" placeholder="Nom du produit..." />
+  <select id="manual-cat">
+    <option>Autre</option>
+    <option>Laitier</option>
+    <option>Épicerie</option>
+    <option>Boissons</option>
+    <option>Petit-déj</option>
+    <option>Fromages</option>
+    <option>Charcuterie</option>
+    <option>Surgelés</option>
+    <option>Fruits & Légumes</option>
+  </select>
+  <button class="btn-add-manual" onclick="addManual()">➕ Ajouter à <span id="market-label">Aldi</span></button>
+</div>
+
+<div class="cats" id="cats"></div>
+<div class="list" id="list"></div>
+
+<div class="bottom-bar" id="bottom-bar" style="display:none">
+  <div>
+    <div class="bottom-count-label" id="bottom-market-name">Aldi</div>
+    <div class="bottom-count"><span id="bottom-done">0</span>/<span id="bottom-total">0</span><span>articles</span></div>
+  </div>
+  <button class="btn-clear-done" id="btn-clear-done" onclick="clearDone()" style="display:none">Supprimer achetés</button>
+</div>
+
+<script>
+const MARKETS = ["Aldi", "Colruyt"];
+const CATEGORIES = ["Tout","Laitier","Épicerie","Boissons","Petit-déj","Fromages","Charcuterie","Surgelés","Fruits & Légumes","Autre"];
+const CAT_COLORS = {
+  "Laitier":"#60a5fa","Épicerie":"#f59e0b","Boissons":"#34d399",
+  "Petit-déj":"#f97316","Fromages":"#a78bfa","Charcuterie":"#fb7185",
+  "Surgelés":"#67e8f9","Fruits & Légumes":"#86efac","Autre":"#94a3b8"
+};
+
+let lists = JSON.parse(localStorage.getItem('courses-lists') || '[[],[]]');
+let activeMarket = 0;
+let filterCat = "Tout";
+let scanning = false;
+let manualOpen = false;
+let pendingScan = null;
+let lastBarcode = null;
+let lastBarcodeTime = 0;
+
+function save() { localStorage.setItem('courses-lists', JSON.stringify(lists)); }
+
+function showToast(msg, type="success") {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast' + (type==='error' ? ' error' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function switchMarket(i) {
+  activeMarket = i;
+  document.querySelectorAll('.tab').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.getElementById('market-label').textContent = MARKETS[i];
+  document.getElementById('bottom-market-name').textContent = MARKETS[i];
+  renderList();
+}
+
+// SCAN
+function toggleScan() {
+  if (scanning) stopScan();
+  else startScan();
+}
+
+function startScan() {
+  const container = document.getElementById('scanner-container');
+  container.classList.add('visible');
+  document.getElementById('btn-scan').classList.add('active');
+  document.getElementById('btn-scan').textContent = '⏹ Stop';
+  scanning = true;
+
+  Quagga.init({
+    inputStream: {
+      name: "Live",
+      type: "LiveStream",
+      target: document.getElementById('interactive'),
+      constraints: {
+        facingMode: "environment",
+        width: { min: 640 },
+        height: { min: 480 },
+      },
+    },
+    decoder: {
+      readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader"]
+    },
+    locate: true,
+  }, function(err) {
+    if (err) {
+      showToast("❌ Caméra non accessible", "error");
+      stopScan();
+      return;
+    }
+    Quagga.start();
+  });
+
+  Quagga.onDetected(function(result) {
+    const code = result.codeResult.code;
+    const now = Date.now();
+    if (code === lastBarcode && now - lastBarcodeTime < 3000) return;
+    lastBarcode = code;
+    lastBarcodeTime = now;
+
+    stopScan();
+    lookupBarcode(code);
+  });
+}
+
+function stopScan() {
+  scanning = false;
+  Quagga.stop();
+  document.getElementById('scanner-container').classList.remove('visible');
+  document.getElementById('btn-scan').classList.remove('active');
+  document.getElementById('btn-scan').textContent = '📷 Scanner';
+}
+
+async function lookupBarcode(code) {
+  showToast("🔍 Recherche produit...");
+  try {
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
+    const data = await res.json();
+    if (data.status === 1) {
+      const p = data.product;
+      const name = p.product_name_fr || p.product_name || `Article ${code.slice(-6)}`;
+      const cat = mapCategory(p.categories_tags || []);
+      pendingScan = { name, category: cat, barcode: code };
+    } else {
+      pendingScan = { name: `Article ${code.slice(-6)}`, category: "Autre", barcode: code };
+    }
+  } catch(e) {
+    pendingScan = { name: `Article ${code.slice(-6)}`, category: "Autre", barcode: code };
+  }
+  showScanResult();
+}
+
+function mapCategory(tags) {
+  const s = tags.join(' ').toLowerCase();
+  if (s.includes('lait') || s.includes('yogurt') || s.includes('yaourt') || s.includes('fromage') && s.includes('frais')) return 'Laitier';
+  if (s.includes('fromage')) return 'Fromages';
+  if (s.includes('boisson') || s.includes('juice') || s.includes('eau') || s.includes('soda')) return 'Boissons';
+  if (s.includes('charcuterie') || s.includes('jambon') || s.includes('saucisse')) return 'Charcuterie';
+  if (s.includes('surgel')) return 'Surgelés';
+  if (s.includes('fruit') || s.includes('legume') || s.includes('légume')) return 'Fruits & Légumes';
+  if (s.includes('cereale') || s.includes('céréale') || s.includes('petit-dejeuner') || s.includes('confiture')) return 'Petit-déj';
+  return 'Épicerie';
+}
+
+function showScanResult() {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const el = document.getElementById('scan-result');
+  document.getElementById('res-name').textContent = pendingScan.name;
+  document.getElementById('res-cat').textContent = pendingScan.category + ' · ' + pendingScan.barcode;
+  el.classList.add('visible');
+}
+
+function confirmScan() {
+  if (!pendingScan) return;
+  addItem(pendingScan.name, pendingScan.category);
+  dismissScan();
+}
+
+function dismissScan() {
+  pendingScan = null;
+  document.getElementById('scan-result').classList.remove('visible');
+}
+
+// MANUAL
+function toggleManual() {
+  manualOpen = !manualOpen;
+  document.getElementById('manual-form').classList.toggle('visible', manualOpen);
+  document.getElementById('btn-manual').classList.toggle('active', manualOpen);
+}
+
+function addManual() {
+  const name = document.getElementById('manual-name').value.trim();
+  const cat = document.getElementById('manual-cat').value;
+  if (!name) return;
+  addItem(name, cat);
+  document.getElementById('manual-name').value = '';
+  document.getElementById('manual-cat').value = 'Autre';
+  toggleManual();
+}
+
+// LIST
+function addItem(name, category) {
+  if (lists[activeMarket].find(i => i.name === name)) {
+    showToast(`"${name}" déjà dans la liste`);
+    return;
+  }
+  lists[activeMarket].push({ id: Date.now(), name, category, done: false });
+  save();
+  renderList();
+  showToast(`✅ "${name}" ajouté à ${MARKETS[activeMarket]}`);
+}
+
+function toggleItem(id) {
+  const item = lists[activeMarket].find(i => i.id === id);
+  if (item) { item.done = !item.done; save(); renderList(); }
+}
+
+function deleteItem(id) {
+  lists[activeMarket] = lists[activeMarket].filter(i => i.id !== id);
+  save(); renderList();
+}
+
+function clearDone() {
+  const count = lists[activeMarket].filter(i => i.done).length;
+  lists[activeMarket] = lists[activeMarket].filter(i => !i.done);
+  save(); renderList();
+  if (count) showToast(`🗑️ ${count} article(s) supprimés`);
+}
+
+function renderList() {
+  // Counts
+  MARKETS.forEach((_, i) => {
+    document.getElementById(`count-${i}`).textContent = lists[i].length;
+  });
+
+  const current = lists[activeMarket];
+  const filtered = filterCat === "Tout" ? current : current.filter(i => i.category === filterCat);
+  const doneCount = current.filter(i => i.done).length;
+
+  // Clear btn
+  document.getElementById('btn-clear').style.display = doneCount > 0 ? 'block' : 'none';
+
+  // Bottom bar
+  const bar = document.getElementById('bottom-bar');
+  bar.style.display = current.length > 0 ? 'flex' : 'none';
+  document.getElementById('bottom-done').textContent = doneCount;
+  document.getElementById('bottom-total').textContent = current.length;
+  document.getElementById('btn-clear-done').style.display = doneCount > 0 ? 'block' : 'none';
+
+  // Categories
+  const catsEl = document.getElementById('cats');
+  catsEl.innerHTML = CATEGORIES.map(c => {
+    const color = CAT_COLORS[c] || '#3b82f6';
+    const active = filterCat === c;
+    return `<button class="cat-btn${active?' active':''}" 
+      style="${active ? `background:${color};` : ''}"
+      onclick="setFilter('${c}')">${c}</button>`;
+  }).join('');
+
+  // List
+  const listEl = document.getElementById('list');
+  if (filtered.length === 0) {
+    listEl.innerHTML = `<div class="empty">
+      <div class="empty-icon">🛒</div>
+      <div class="empty-title">Liste vide</div>
+      <div class="empty-sub">Scanner un article ou ajouter manuellement</div>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(item => {
+    const color = CAT_COLORS[item.category] || '#94a3b8';
+    return `<div class="item${item.done?' done':''}">
+      <button class="check-btn${item.done?' checked':''}" onclick="toggleItem(${item.id})">
+        ${item.done ? '✓' : ''}
+      </button>
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-cat" style="color:${color}">${item.category}</div>
+      </div>
+      <button class="del-btn" onclick="deleteItem(${item.id})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(cat) {
+  filterCat = cat;
+  renderList();
+}
+
+renderList();
+</script>
+</body>
+</html>
