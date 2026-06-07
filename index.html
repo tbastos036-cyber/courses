@@ -7,206 +7,113 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    font-family: 'Sora', sans-serif;
-    color: #f1f5f9;
-    min-height: 100vh;
-    max-width: 430px;
-    margin: 0 auto;
-  }
-  ::-webkit-scrollbar { display: none; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+body { background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); font-family:'Sora',sans-serif; color:#f1f5f9; min-height:100vh; max-width:430px; margin:0 auto; }
+::-webkit-scrollbar { display:none; }
 
-  /* HEADER */
-  .header { padding: 32px 20px 0; }
-  .header-sub { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: #64748b; margin-bottom: 4px; }
-  .header-title { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+.header { padding:28px 20px 0; }
+.header-sub { font-size:11px; font-weight:600; letter-spacing:3px; color:#64748b; margin-bottom:4px; }
+.header-title { font-size:26px; font-weight:800; letter-spacing:-1px; }
 
-  /* TABS */
-  .tabs { display: flex; gap: 8px; margin: 18px 20px 0; background: #1e293b; border-radius: 14px; padding: 4px; }
-  .tab {
-    flex: 1; padding: 10px 0; border-radius: 10px;
-    background: transparent; border: none; color: #64748b;
-    font-weight: 700; font-size: 13px; cursor: pointer;
-    font-family: 'Sora', sans-serif; transition: all 0.2s;
-  }
-  .tab.active {
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-    color: white;
-    box-shadow: 0 4px 12px rgba(99,102,241,0.4);
-  }
-  .tab-count {
-    margin-left: 6px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 20px; padding: 1px 7px; font-size: 11px;
-  }
-  .tab:not(.active) .tab-count { background: #334155; }
+.tabs { display:flex; gap:8px; margin:16px 20px 0; background:#1e293b; border-radius:14px; padding:4px; }
+.tab { flex:1; padding:10px 0; border-radius:10px; background:transparent; border:none; color:#64748b; font-weight:700; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; transition:all 0.2s; }
+.tab.active { background:linear-gradient(135deg,#3b82f6,#6366f1); color:white; box-shadow:0 4px 12px rgba(99,102,241,0.4); }
 
-  /* ACTIONS */
-  .actions { display: flex; gap: 8px; padding: 14px 20px 8px; }
-  .btn {
-    flex: 1; padding: 12px 0; border: none; border-radius: 12px;
-    color: white; font-weight: 700; font-size: 13px; cursor: pointer;
-    font-family: 'Sora', sans-serif; transition: all 0.2s;
-  }
-  .btn-scan { background: linear-gradient(135deg, #10b981, #06b6d4); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
-  .btn-scan.active { background: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.4); }
-  .btn-manual { background: linear-gradient(135deg, #f59e0b, #f97316); }
-  .btn-manual.active { background: #334155; }
-  .btn-clear { flex: 0; padding: 12px 14px; background: #334155; color: #fb7185; }
+.actions { display:flex; gap:8px; padding:14px 20px 8px; }
+.btn { flex:1; padding:11px 0; border:none; border-radius:12px; color:white; font-weight:700; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; transition:all 0.2s; }
+.btn-scan { background:linear-gradient(135deg,#10b981,#06b6d4); box-shadow:0 4px 12px rgba(16,185,129,0.25); }
+.btn-scan.active { background:#ef4444; }
+.btn-reset { background:#334155; color:#94a3b8; }
+.btn-clear { background:#334155; color:#fb7185; flex:0; padding:11px 14px; }
 
-  /* SCANNER */
-  #scanner-container {
-    margin: 0 20px 12px; border-radius: 16px; overflow: hidden;
-    position: relative; background: #000; display: none;
-  }
-  #scanner-container.visible { display: block; }
-  #scanner-container video { width: 100%; display: block; }
-  #scanner-container canvas { display: none; }
-  .scan-overlay {
-    position: absolute; inset: 0; display: flex;
-    align-items: center; justify-content: center; pointer-events: none;
-  }
-  .scan-box {
-    width: 220px; height: 120px;
-    border: 3px solid #10b981; border-radius: 12px;
-    box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-  }
-  .scan-label {
-    position: absolute; bottom: 12px; left: 0; right: 0;
-    text-align: center; color: #10b981; font-weight: 600; font-size: 13px;
-  }
-  .scan-line {
-    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-    width: 214px; height: 2px; background: #10b981;
-    animation: scanline 1.5s ease-in-out infinite;
-    opacity: 0.8;
-  }
-  @keyframes scanline {
-    0% { top: calc(50% - 57px); }
-    50% { top: calc(50% + 57px); }
-    100% { top: calc(50% - 57px); }
-  }
+.search-bar { margin:0 20px 10px; }
+.search-bar input { width:100%; background:#1e293b; border:1px solid #334155; border-radius:12px; padding:11px 16px; color:white; font-size:14px; font-family:'Sora',sans-serif; outline:none; }
+.search-bar input::placeholder { color:#475569; }
 
-  /* SCAN RESULT */
-  .scan-result {
-    margin: 0 20px 12px; background: #1e293b; border-radius: 16px; padding: 16px;
-    border: 1px solid #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.15);
-    display: none;
-  }
-  .scan-result.visible { display: block; }
-  .scan-result-sub { font-size: 12px; color: #64748b; margin-bottom: 4px; }
-  .scan-result-name { font-weight: 700; font-size: 16px; }
-  .scan-result-cat { font-size: 12px; color: #10b981; margin-bottom: 12px; }
-  .scan-result-btns { display: flex; gap: 8px; }
-  .btn-add-scan {
-    flex: 1; padding: 10px 0;
-    background: linear-gradient(135deg, #10b981, #06b6d4);
-    border: none; border-radius: 10px; color: white;
-    font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Sora', sans-serif;
-  }
-  .btn-dismiss {
-    padding: 10px 16px; background: #334155;
-    border: none; border-radius: 10px; color: #94a3b8;
-    font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Sora', sans-serif;
-  }
+/* SCANNER */
+#scanner-wrap { margin:0 20px 12px; border-radius:16px; overflow:hidden; position:relative; background:#000; display:none; }
+#scanner-wrap.visible { display:block; }
+#interactive video { width:100%; display:block; max-height:220px; object-fit:cover; }
+#interactive canvas { display:none; }
+.scan-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.scan-box { width:220px; height:100px; border:3px solid #10b981; border-radius:12px; box-shadow:0 0 0 9999px rgba(0,0,0,0.5); position:relative; }
+.scan-line { position:absolute; left:4px; right:4px; height:2px; background:#10b981; top:0; animation:scanline 1.5s ease-in-out infinite; }
+@keyframes scanline { 0%{top:0} 50%{top:94px} 100%{top:0} }
+.scan-label { position:absolute; bottom:10px; left:0; right:0; text-align:center; color:#10b981; font-weight:600; font-size:12px; }
 
-  /* MANUAL FORM */
-  .manual-form {
-    margin: 0 20px 12px; background: #1e293b; border-radius: 16px; padding: 16px;
-    display: none;
-  }
-  .manual-form.visible { display: block; }
-  .manual-form input, .manual-form select {
-    width: 100%; background: #0f172a; border: 1px solid #334155;
-    border-radius: 10px; padding: 11px 14px; color: white; font-size: 14px;
-    margin-bottom: 8px; outline: none; font-family: 'Sora', sans-serif;
-  }
-  .manual-form select option { background: #1e293b; }
-  .btn-add-manual {
-    width: 100%; padding: 12px 0;
-    background: linear-gradient(135deg, #f59e0b, #f97316);
-    border: none; border-radius: 10px; color: white;
-    font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Sora', sans-serif;
-  }
+/* SCAN RESULT */
+.scan-result { margin:0 20px 12px; background:#1e293b; border-radius:16px; padding:16px; border:1px solid #10b981; display:none; }
+.scan-result.visible { display:block; }
+.sr-sub { font-size:11px; color:#64748b; margin-bottom:3px; }
+.sr-name { font-weight:700; font-size:15px; margin-bottom:2px; }
+.sr-info { font-size:11px; color:#10b981; margin-bottom:10px; }
+.sr-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+.sr-row select { flex:1; background:#0f172a; border:1px solid #334155; border-radius:10px; padding:9px 12px; color:white; font-family:'Sora',sans-serif; font-size:13px; outline:none; }
+.sr-btns { display:flex; gap:8px; }
+.btn-add-scan { flex:1; padding:10px 0; background:linear-gradient(135deg,#10b981,#06b6d4); border:none; border-radius:10px; color:white; font-weight:700; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; }
+.btn-dismiss { padding:10px 14px; background:#334155; border:none; border-radius:10px; color:#94a3b8; font-weight:600; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; }
 
-  /* CATEGORY FILTER */
-  .cats {
-    display: flex; gap: 6px; padding: 4px 20px 12px;
-    overflow-x: auto; scrollbar-width: none;
-  }
-  .cat-btn {
-    white-space: nowrap; padding: 6px 12px;
-    background: #1e293b; border: none; border-radius: 20px;
-    color: #64748b; font-weight: 600; font-size: 11px; cursor: pointer;
-    font-family: 'Sora', sans-serif; transition: all 0.15s;
-  }
-  .cat-btn.active { color: white; }
+.list { padding:0 20px 130px; }
 
-  /* LIST */
-  .list { padding: 0 20px 140px; }
-  .empty {
-    text-align: center; padding: 60px 0; color: #334155;
-  }
-  .empty-icon { font-size: 48px; margin-bottom: 12px; }
-  .empty-title { font-weight: 600; font-size: 15px; }
-  .empty-sub { font-size: 13px; margin-top: 4px; color: #475569; }
+/* SECTION */
+.section-header { display:flex; align-items:center; justify-content:space-between; padding:10px 0 5px; }
+.section-title { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+.btn-add-cat { background:none; border:none; color:#475569; font-size:20px; cursor:pointer; padding:0 4px; line-height:1; font-weight:300; }
+.btn-add-cat:hover { color:#94a3b8; }
 
-  .item {
-    display: flex; align-items: center; gap: 12px;
-    background: #1e293b; border-radius: 14px; padding: 13px 14px;
-    margin-bottom: 8px; border: 1px solid #334155; transition: all 0.2s;
-  }
-  .item.done { background: #0f172a; border-color: #1e293b; opacity: 0.5; }
-  .check-btn {
-    width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
-    background: transparent; border: 2px solid #475569;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 14px; transition: all 0.15s;
-  }
-  .check-btn.checked { background: #10b981; border-color: #10b981; }
-  .item-info { flex: 1; }
-  .item-name { font-weight: 600; font-size: 14px; }
-  .item.done .item-name { text-decoration: line-through; color: #475569; }
-  .item-cat { font-size: 11px; margin-top: 2px; font-weight: 600; }
-  .del-btn {
-    background: none; border: none; color: #475569;
-    font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;
-  }
+/* ADD IN CAT */
+.add-in-cat { display:none; background:#0f172a; border-radius:12px; padding:10px; margin-bottom:8px; border:1px solid #334155; }
+.add-in-cat.visible { display:flex; gap:8px; }
+.add-in-cat input { flex:1; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:9px 12px; color:white; font-size:13px; font-family:'Sora',sans-serif; outline:none; }
+.btn-add-confirm { padding:9px 14px; background:linear-gradient(135deg,#f59e0b,#f97316); border:none; border-radius:8px; color:white; font-weight:700; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; }
 
-  /* BOTTOM BAR */
-  .bottom-bar {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 430px;
-    background: linear-gradient(0deg, #0f172a 60%, transparent);
-    padding: 20px 20px 32px;
-    display: flex; justify-content: space-between; align-items: flex-end;
-  }
-  .bottom-count-label { font-size: 11px; color: #64748b; font-weight: 600; }
-  .bottom-count { font-weight: 800; font-size: 24px; }
-  .bottom-count span { font-size: 13px; font-weight: 400; color: #64748b; margin-left: 6px; }
-  .btn-clear-done {
-    background: linear-gradient(135deg, #ef4444, #f97316);
-    border: none; border-radius: 12px; padding: 10px 16px;
-    color: white; font-weight: 700; font-size: 13px; cursor: pointer;
-    font-family: 'Sora', sans-serif;
-  }
+/* ITEM */
+.item { display:flex; align-items:center; gap:9px; background:#1e293b; border-radius:14px; padding:10px 11px; margin-bottom:7px; border:1px solid #334155; transition:all 0.2s; position:relative; }
+.item.zero { opacity:0.35; }
+.item.done { background:#0f172a; border-color:#1e293b; opacity:0.45; }
+.item.dragging { opacity:0.4; border:2px dashed #6366f1; }
+.item.drag-over { border:2px solid #10b981; background:#0f2820; }
 
-  /* TOAST */
-  .toast {
-    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-    background: #10b981; color: white; padding: 10px 22px; border-radius: 50px;
-    font-weight: 600; font-size: 13px; z-index: 9999;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    animation: fadeDown 0.25s ease;
-    white-space: nowrap;
-  }
-  .toast.error { background: #ef4444; }
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-  }
+.drag-handle { color:#334155; font-size:16px; cursor:grab; padding:0 2px; flex-shrink:0; user-select:none; touch-action:none; }
+.drag-handle:active { cursor:grabbing; color:#64748b; }
+
+.check-btn { width:24px; height:24px; border-radius:7px; flex-shrink:0; background:transparent; border:2px solid #475569; cursor:pointer; display:flex; align-items:center; justify-content:center; color:white; font-size:13px; transition:all 0.15s; }
+.check-btn.checked { background:#10b981; border-color:#10b981; }
+
+.item-info { flex:1; min-width:0; cursor:pointer; }
+.item-name { font-weight:600; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.item.done .item-name { text-decoration:line-through; color:#475569; }
+.item-cat-badge { font-size:10px; margin-top:2px; font-weight:600; }
+
+.qty-ctrl { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.qty-btn { width:26px; height:26px; border-radius:8px; border:none; background:#334155; color:white; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:700; line-height:1; }
+.qty-num { font-size:14px; font-weight:700; min-width:18px; text-align:center; }
+.qty-num.zero { color:#475569; }
+
+.del-btn { background:none; border:none; color:#334155; font-size:18px; cursor:pointer; padding:0 2px; flex-shrink:0; }
+.del-btn:hover { color:#fb7185; }
+
+/* MOVE MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:flex-end; justify-content:center; }
+.modal-overlay.visible { display:flex; }
+.modal { background:#1e293b; border-radius:20px 20px 0 0; padding:20px; width:100%; max-width:430px; max-height:70vh; overflow-y:auto; }
+.modal-title { font-weight:700; font-size:15px; margin-bottom:14px; }
+.modal-cat-btn { display:block; width:100%; padding:12px 16px; background:#0f172a; border:1px solid #334155; border-radius:12px; color:white; font-family:'Sora',sans-serif; font-weight:600; font-size:13px; cursor:pointer; margin-bottom:8px; text-align:left; transition:all 0.15s; }
+.modal-cat-btn:hover { border-color:#6366f1; }
+.modal-close { display:block; width:100%; padding:12px; background:#334155; border:none; border-radius:12px; color:#94a3b8; font-family:'Sora',sans-serif; font-weight:600; font-size:13px; cursor:pointer; margin-top:4px; }
+
+/* BOTTOM */
+.bottom-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:linear-gradient(0deg,#0f172a 60%,transparent); padding:16px 20px 28px; display:flex; justify-content:space-between; align-items:flex-end; }
+.bottom-label { font-size:11px; color:#64748b; font-weight:600; }
+.bottom-count { font-weight:800; font-size:22px; }
+.bottom-count span { font-size:12px; font-weight:400; color:#64748b; margin-left:5px; }
+.btn-clear-done { background:linear-gradient(135deg,#ef4444,#f97316); border:none; border-radius:12px; padding:10px 14px; color:white; font-weight:700; font-size:12px; cursor:pointer; font-family:'Sora',sans-serif; }
+
+.toast { position:fixed; top:16px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:10px 22px; border-radius:50px; font-weight:600; font-size:13px; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,0.4); animation:fadeDown 0.25s ease; white-space:nowrap; }
+.toast.error { background:#ef4444; }
+@keyframes fadeDown { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+.empty { text-align:center; padding:50px 0; color:#334155; }
+.empty-icon { font-size:44px; margin-bottom:10px; }
 </style>
 </head>
 <body>
@@ -217,149 +124,166 @@
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchMarket(0)">
-    Aldi <span class="tab-count" id="count-0">0</span>
-  </button>
-  <button class="tab" onclick="switchMarket(1)">
-    Colruyt <span class="tab-count" id="count-1">0</span>
-  </button>
+  <button class="tab active" onclick="switchMarket(0)">Aldi</button>
+  <button class="tab" onclick="switchMarket(1)">Colruyt</button>
 </div>
 
 <div class="actions">
   <button class="btn btn-scan" id="btn-scan" onclick="toggleScan()">📷 Scanner</button>
-  <button class="btn btn-manual" id="btn-manual" onclick="toggleManual()">✏️ Manuel</button>
-  <button class="btn btn-clear" id="btn-clear" onclick="clearDone()" style="display:none">🗑️</button>
+  <button class="btn btn-reset" onclick="resetQtys()">↺ Reset</button>
+  <button class="btn btn-clear" onclick="clearDone()">🗑️</button>
 </div>
 
-<div id="scanner-container">
+<!-- SCANNER -->
+<div id="scanner-wrap">
   <div id="interactive" class="viewport"></div>
-  <div class="scan-overlay">
-    <div style="position:relative">
-      <div class="scan-box"></div>
-      <div class="scan-line"></div>
-    </div>
-  </div>
+  <div class="scan-overlay"><div class="scan-box"><div class="scan-line"></div></div></div>
   <div class="scan-label">📦 Pointez le code-barres</div>
 </div>
 
+<!-- SCAN RESULT -->
 <div class="scan-result" id="scan-result">
-  <div class="scan-result-sub">Produit détecté</div>
-  <div class="scan-result-name" id="res-name"></div>
-  <div class="scan-result-cat" id="res-cat"></div>
-  <div class="scan-result-btns">
+  <div class="sr-sub">Produit détecté</div>
+  <div class="sr-name" id="sr-name"></div>
+  <div class="sr-info" id="sr-info"></div>
+  <div class="sr-row">
+    <select id="sr-market">
+      <option value="0">Aldi</option>
+      <option value="1">Colruyt</option>
+    </select>
+    <select id="sr-cat"></select>
+  </div>
+  <div class="sr-btns">
     <button class="btn-add-scan" onclick="confirmScan()">✅ Ajouter</button>
     <button class="btn-dismiss" onclick="dismissScan()">✕</button>
   </div>
 </div>
 
-<div class="manual-form" id="manual-form">
-  <input type="text" id="manual-name" placeholder="Nom du produit..." />
-  <select id="manual-cat">
-    <option>Autre</option>
-    <option>Laitier</option>
-    <option>Épicerie</option>
-    <option>Boissons</option>
-    <option>Petit-déj</option>
-    <option>Fromages</option>
-    <option>Charcuterie</option>
-    <option>Surgelés</option>
-    <option>Fruits & Légumes</option>
-  </select>
-  <button class="btn-add-manual" onclick="addManual()">➕ Ajouter à <span id="market-label">Aldi</span></button>
+<div class="search-bar">
+  <input type="text" id="search" placeholder="🔍 Rechercher..." oninput="renderList()">
 </div>
 
-<div class="cats" id="cats"></div>
 <div class="list" id="list"></div>
 
-<div class="bottom-bar" id="bottom-bar" style="display:none">
-  <div>
-    <div class="bottom-count-label" id="bottom-market-name">Aldi</div>
-    <div class="bottom-count"><span id="bottom-done">0</span>/<span id="bottom-total">0</span><span>articles</span></div>
+<!-- MOVE MODAL -->
+<div class="modal-overlay" id="move-modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">🔀 Déplacer vers...</div>
+    <div id="modal-cats"></div>
+    <button class="modal-close" onclick="closeModal()">Annuler</button>
   </div>
-  <button class="btn-clear-done" id="btn-clear-done" onclick="clearDone()" style="display:none">Supprimer achetés</button>
+</div>
+
+<div class="bottom-bar">
+  <div>
+    <div class="bottom-label" id="bottom-market">Aldi</div>
+    <div class="bottom-count"><span id="bottom-active">0</span>/<span id="bottom-total">0</span><span>à acheter</span></div>
+  </div>
+  <button class="btn-clear-done" onclick="clearDone()">Supprimer achetés</button>
 </div>
 
 <script>
-const MARKETS = ["Aldi", "Colruyt"];
-const CATEGORIES = ["Tout","Laitier","Épicerie","Boissons","Petit-déj","Fromages","Charcuterie","Surgelés","Fruits & Légumes","Autre"];
 const CAT_COLORS = {
-  "Laitier":"#60a5fa","Épicerie":"#f59e0b","Boissons":"#34d399",
-  "Petit-déj":"#f97316","Fromages":"#a78bfa","Charcuterie":"#fb7185",
-  "Surgelés":"#67e8f9","Fruits & Légumes":"#86efac","Autre":"#94a3b8"
+  "Carne/Charc":"#fb7185","Snacks/Apero":"#f97316","Sementes & Co":"#86efac",
+  "Frutas/Legumes":"#4ade80","Frigo":"#60a5fa","Pequeno Almoço":"#f59e0b",
+  "Acompanhamentos":"#a78bfa","Especiarias/Bolos":"#fcd34d","Congelados":"#67e8f9",
+  "Bebidas":"#34d399","Hygiène/Casa":"#94a3b8","Reservas":"#c084fc"
 };
+const ALL_CATS = Object.keys(CAT_COLORS);
+const MARKETS = ["Aldi","Colruyt"];
 
-let lists = JSON.parse(localStorage.getItem('courses-lists') || '[[],[]]');
+const DEFAULT_LISTS = [
+  [
+    {id:1,name:"Frango",cat:"Carne/Charc",qty:1},{id:2,name:"Vaca",cat:"Carne/Charc",qty:1},{id:3,name:"Porco",cat:"Carne/Charc",qty:0},{id:4,name:"Salsichas",cat:"Carne/Charc",qty:0},{id:5,name:"Charcuterie frango/fiambre",cat:"Carne/Charc",qty:1},{id:6,name:"Speck Schinterwürfel",cat:"Carne/Charc",qty:1},{id:7,name:"Wraps",cat:"Carne/Charc",qty:1},
+    {id:8,name:"Snacks trabalho",cat:"Snacks/Apero",qty:1},{id:9,name:"Receitas Brioche etc",cat:"Snacks/Apero",qty:0},{id:10,name:"Aperos",cat:"Snacks/Apero",qty:0},
+    {id:11,name:"Chia",cat:"Sementes & Co",qty:1},{id:12,name:"Macadamia",cat:"Sementes & Co",qty:0},{id:13,name:"Pekan",cat:"Sementes & Co",qty:0},{id:14,name:"Amendoins",cat:"Sementes & Co",qty:1},{id:15,name:"Nozes",cat:"Sementes & Co",qty:1},{id:16,name:"Coco râpé",cat:"Sementes & Co",qty:0},{id:17,name:"Farinha de amendoa",cat:"Sementes & Co",qty:1},{id:18,name:"Cashew",cat:"Sementes & Co",qty:0},{id:19,name:"Batata doce",cat:"Sementes & Co",qty:2},{id:20,name:"Batata",cat:"Sementes & Co",qty:1},{id:21,name:"Cebola",cat:"Sementes & Co",qty:1},{id:22,name:"Alho",cat:"Sementes & Co",qty:1},{id:23,name:"Bananas",cat:"Sementes & Co",qty:1},{id:24,name:"Sementes pão",cat:"Sementes & Co",qty:1},
+    {id:25,name:"Uvas",cat:"Frutas/Legumes",qty:1},{id:26,name:"Melão",cat:"Frutas/Legumes",qty:0},{id:27,name:"Melancia",cat:"Frutas/Legumes",qty:0},{id:28,name:"Mango",cat:"Frutas/Legumes",qty:1},{id:29,name:"Avocado",cat:"Frutas/Legumes",qty:2},{id:30,name:"Nectarine",cat:"Frutas/Legumes",qty:0},{id:31,name:"Peras",cat:"Frutas/Legumes",qty:0},{id:32,name:"Tomates",cat:"Frutas/Legumes",qty:2},{id:33,name:"Pepino",cat:"Frutas/Legumes",qty:1},{id:34,name:"Chicon",cat:"Frutas/Legumes",qty:0},
+    {id:35,name:"Tortellini frescas",cat:"Frigo",qty:1},{id:36,name:"Queijo barrar",cat:"Frigo",qty:1},{id:37,name:"Queijo fresco",cat:"Frigo",qty:1},{id:38,name:"Manteiga",cat:"Frigo",qty:1},{id:39,name:"Iogurte Leo & Ana",cat:"Frigo",qty:2},{id:40,name:"Skyr",cat:"Frigo",qty:1},{id:41,name:"Schmand",cat:"Frigo",qty:1},{id:42,name:"Natas",cat:"Frigo",qty:1},{id:43,name:"Mozza",cat:"Frigo",qty:1},{id:44,name:"Feta",cat:"Frigo",qty:1},{id:45,name:"Burrata",cat:"Frigo",qty:0},{id:46,name:"Queijo fatias",cat:"Frigo",qty:1},{id:47,name:"Queijo ralado",cat:"Frigo",qty:1},{id:48,name:"Boursin",cat:"Frigo",qty:0},{id:49,name:"Humous",cat:"Frigo",qty:1},
+    {id:50,name:"Cracottes",cat:"Pequeno Almoço",qty:1},{id:51,name:"Pasta de amendoim",cat:"Pequeno Almoço",qty:1},{id:52,name:"Leite sem lactose",cat:"Pequeno Almoço",qty:2},{id:53,name:"Leite de coco",cat:"Pequeno Almoço",qty:1},{id:54,name:"Paes de leite",cat:"Pequeno Almoço",qty:1},{id:55,name:"Hefe",cat:"Pequeno Almoço",qty:1},{id:56,name:"Pão lamb",cat:"Pequeno Almoço",qty:1},
+    {id:57,name:"Massas",cat:"Acompanhamentos",qty:1},{id:58,name:"Arroz (saco)",cat:"Acompanhamentos",qty:1},{id:59,name:"Linsen",cat:"Acompanhamentos",qty:1},{id:60,name:"Leite coco (conserva)",cat:"Acompanhamentos",qty:2},{id:61,name:"Tomatada",cat:"Acompanhamentos",qty:2},{id:62,name:"Vinagre branco",cat:"Acompanhamentos",qty:0},{id:63,name:"Balsamico",cat:"Acompanhamentos",qty:0},{id:64,name:"Creme balsamico",cat:"Acompanhamentos",qty:1},{id:65,name:"Oleo",cat:"Acompanhamentos",qty:0},{id:66,name:"Oleo coco",cat:"Acompanhamentos",qty:1},{id:67,name:"Kräuter salat condions",cat:"Acompanhamentos",qty:1},{id:68,name:"Pesto / Mayo / Sauces",cat:"Acompanhamentos",qty:0},
+    {id:69,name:"Farinha",cat:"Especiarias/Bolos",qty:1},{id:70,name:"Açucar castanho",cat:"Especiarias/Bolos",qty:1},
+    {id:71,name:"Peixe (congelado)",cat:"Congelados",qty:1},{id:72,name:"Carne (congelada)",cat:"Congelados",qty:1},{id:73,name:"Batatas (congeladas)",cat:"Congelados",qty:1},{id:74,name:"Gelados s/açucar",cat:"Congelados",qty:1},{id:75,name:"Rösti",cat:"Congelados",qty:1},
+    {id:76,name:"Aguas",cat:"Bebidas",qty:2},{id:77,name:"Outros bebidas",cat:"Bebidas",qty:0},
+    {id:78,name:"Sacos",cat:"Hygiène/Casa",qty:1},{id:79,name:"Produtos limpeza",cat:"Hygiène/Casa",qty:0},{id:80,name:"Produtos hygiène",cat:"Hygiène/Casa",qty:0},{id:81,name:"Kleenex",cat:"Hygiène/Casa",qty:1},
+    {id:82,name:"Enlatados",cat:"Reservas",qty:0},{id:83,name:"Frascos carne vermelha",cat:"Reservas",qty:1},{id:84,name:"Granola / Kellog's",cat:"Reservas",qty:1},{id:85,name:"Pizzas congeladas",cat:"Reservas",qty:1}
+  ],
+  [
+    {id:101,name:"Frango",cat:"Carne/Charc",qty:1},{id:102,name:"Vaca",cat:"Carne/Charc",qty:1},{id:103,name:"Porco",cat:"Carne/Charc",qty:0},{id:104,name:"Salsichas",cat:"Carne/Charc",qty:0},
+    {id:105,name:"Snacks trabalho",cat:"Snacks/Apero",qty:1},{id:106,name:"Queiches secos bni",cat:"Snacks/Apero",qty:1},
+    {id:107,name:"Chia",cat:"Sementes & Co",qty:1},{id:108,name:"Pekan",cat:"Sementes & Co",qty:0},{id:109,name:"Amendoins",cat:"Sementes & Co",qty:1},{id:110,name:"Farinha de amendoa",cat:"Sementes & Co",qty:1},{id:111,name:"Batata doce",cat:"Sementes & Co",qty:2},
+    {id:112,name:"Myrtilles 500g",cat:"Frutas/Legumes",qty:1},{id:113,name:"Myrtilles 1300g",cat:"Frutas/Legumes",qty:0},
+    {id:114,name:"Tortellini frescas",cat:"Frigo",qty:1},{id:115,name:"Queijo barrar",cat:"Frigo",qty:1},{id:116,name:"Manteiga",cat:"Frigo",qty:1},{id:117,name:"Iogurte Leo & Ana",cat:"Frigo",qty:2},{id:118,name:"Feta",cat:"Frigo",qty:1},{id:119,name:"Burrata",cat:"Frigo",qty:0},{id:120,name:"Queijo Flandrien",cat:"Frigo",qty:1},{id:121,name:"Queijo fatias 500g",cat:"Frigo",qty:1},{id:122,name:"Queijo ralado",cat:"Frigo",qty:1},{id:123,name:"Boursin",cat:"Frigo",qty:1},
+    {id:124,name:"Café",cat:"Pequeno Almoço",qty:1},{id:125,name:"Cracottes",cat:"Pequeno Almoço",qty:1},{id:126,name:"Pasta de amendoim",cat:"Pequeno Almoço",qty:1},{id:127,name:"Leite sem lactose",cat:"Pequeno Almoço",qty:2},{id:128,name:"Leite de coco",cat:"Pequeno Almoço",qty:1},{id:129,name:"Pão 3-4x",cat:"Pequeno Almoço",qty:3},
+    {id:130,name:"Massas Fusilli",cat:"Acompanhamentos",qty:1},{id:131,name:"Arroz Pig 2x",cat:"Acompanhamentos",qty:2},{id:132,name:"Chia/Linsen",cat:"Acompanhamentos",qty:1},{id:133,name:"Leite coco (conserva)",cat:"Acompanhamentos",qty:2},{id:134,name:"Tomatada",cat:"Acompanhamentos",qty:2},{id:135,name:"Pesto / Mayo / Sauces",cat:"Acompanhamentos",qty:1},
+    {id:136,name:"Temperos grandes",cat:"Especiarias/Bolos",qty:1},{id:137,name:"Farinha",cat:"Especiarias/Bolos",qty:1},{id:138,name:"Açucar castanho",cat:"Especiarias/Bolos",qty:1},
+    {id:139,name:"Peixe J.Prono",cat:"Congelados",qty:1},{id:140,name:"Outros congelados",cat:"Congelados",qty:0},
+    {id:141,name:"Aguas Vittel",cat:"Bebidas",qty:2},{id:142,name:"Crodino / Schweppes",cat:"Bebidas",qty:1},{id:143,name:"Cerveja 0%",cat:"Bebidas",qty:1},
+    {id:144,name:"Sacos",cat:"Hygiène/Casa",qty:1},{id:145,name:"Bolachas",cat:"Hygiène/Casa",qty:1},
+    {id:146,name:"Chocapics",cat:"Reservas",qty:1},{id:147,name:"Pizza",cat:"Reservas",qty:1}
+  ]
+];
+
+const MARKETS_ARR = ["Aldi","Colruyt"];
 let activeMarket = 0;
-let filterCat = "Tout";
+let lists = JSON.parse(localStorage.getItem('lists-v4') || 'null');
+if (!lists) lists = DEFAULT_LISTS.map(l => l.map(i => ({...i, done:false})));
+
 let scanning = false;
-let manualOpen = false;
 let pendingScan = null;
 let lastBarcode = null;
 let lastBarcodeTime = 0;
+let moveItemId = null;
+let openAddCat = null;
+let dragSrcId = null;
+let nextId = 1000;
 
-function save() { localStorage.setItem('courses-lists', JSON.stringify(lists)); }
+function save() { localStorage.setItem('lists-v4', JSON.stringify(lists)); }
 
-function showToast(msg, type="success") {
-  document.querySelectorAll('.toast').forEach(t => t.remove());
+function showToast(msg, type='success') {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
   const t = document.createElement('div');
-  t.className = 'toast' + (type==='error' ? ' error' : '');
+  t.className = 'toast'+(type==='error'?' error':'');
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2500);
+  setTimeout(()=>t.remove(), 2200);
 }
 
 function switchMarket(i) {
   activeMarket = i;
-  document.querySelectorAll('.tab').forEach((t,j) => t.classList.toggle('active', j===i));
-  document.getElementById('market-label').textContent = MARKETS[i];
-  document.getElementById('bottom-market-name').textContent = MARKETS[i];
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.getElementById('bottom-market').textContent = MARKETS_ARR[i];
+  document.getElementById('search').value = '';
+  openAddCat = null;
   renderList();
 }
 
-// SCAN
-function toggleScan() {
-  if (scanning) stopScan();
-  else startScan();
-}
+// ---- SCANNER ----
+function toggleScan() { scanning ? stopScan() : startScan(); }
 
 function startScan() {
-  const container = document.getElementById('scanner-container');
-  container.classList.add('visible');
+  document.getElementById('scanner-wrap').classList.add('visible');
   document.getElementById('btn-scan').classList.add('active');
   document.getElementById('btn-scan').textContent = '⏹ Stop';
   scanning = true;
+  // pre-fill scan market select
+  document.getElementById('sr-market').value = activeMarket;
+  // fill cat select
+  fillSrCat();
 
   Quagga.init({
-    inputStream: {
-      name: "Live",
-      type: "LiveStream",
-      target: document.getElementById('interactive'),
-      constraints: {
-        facingMode: "environment",
-        width: { min: 640 },
-        height: { min: 480 },
-      },
-    },
-    decoder: {
-      readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader"]
-    },
-    locate: true,
-  }, function(err) {
-    if (err) {
-      showToast("❌ Caméra non accessible", "error");
-      stopScan();
-      return;
-    }
+    inputStream:{ name:"Live", type:"LiveStream", target:document.getElementById('interactive'), constraints:{ facingMode:"environment", width:{min:640}, height:{min:480} } },
+    decoder:{ readers:["ean_reader","ean_8_reader","code_128_reader","upc_reader"] },
+    locate:true
+  }, err => {
+    if(err){ showToast("❌ Caméra non accessible","error"); stopScan(); return; }
     Quagga.start();
   });
 
-  Quagga.onDetected(function(result) {
+  Quagga.onDetected(result => {
     const code = result.codeResult.code;
     const now = Date.now();
-    if (code === lastBarcode && now - lastBarcodeTime < 3000) return;
-    lastBarcode = code;
-    lastBarcodeTime = now;
-
+    if(code===lastBarcode && now-lastBarcodeTime<3000) return;
+    lastBarcode = code; lastBarcodeTime = now;
     stopScan();
     lookupBarcode(code);
   });
@@ -367,55 +291,67 @@ function startScan() {
 
 function stopScan() {
   scanning = false;
-  Quagga.stop();
-  document.getElementById('scanner-container').classList.remove('visible');
+  try { Quagga.stop(); } catch(e){}
+  document.getElementById('scanner-wrap').classList.remove('visible');
   document.getElementById('btn-scan').classList.remove('active');
   document.getElementById('btn-scan').textContent = '📷 Scanner';
 }
 
+function fillSrCat() {
+  const sel = document.getElementById('sr-cat');
+  sel.innerHTML = ALL_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+
 async function lookupBarcode(code) {
-  showToast("🔍 Recherche produit...");
+  showToast("🔍 Recherche...");
   try {
     const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code}.json`);
     const data = await res.json();
-    if (data.status === 1) {
+    if(data.status===1) {
       const p = data.product;
       const name = p.product_name_fr || p.product_name || `Article ${code.slice(-6)}`;
-      const cat = mapCategory(p.categories_tags || []);
-      pendingScan = { name, category: cat, barcode: code };
+      const cat = mapCat(p.categories_tags||[]);
+      pendingScan = {name, cat, barcode:code};
     } else {
-      pendingScan = { name: `Article ${code.slice(-6)}`, category: "Autre", barcode: code };
+      pendingScan = {name:`Article ${code.slice(-6)}`, cat:"Autre", barcode:code};
     }
   } catch(e) {
-    pendingScan = { name: `Article ${code.slice(-6)}`, category: "Autre", barcode: code };
+    pendingScan = {name:`Article ${code.slice(-6)}`, cat:"Épicerie", barcode:code};
   }
   showScanResult();
 }
 
-function mapCategory(tags) {
+function mapCat(tags) {
   const s = tags.join(' ').toLowerCase();
-  if (s.includes('lait') || s.includes('yogurt') || s.includes('yaourt') || s.includes('fromage') && s.includes('frais')) return 'Laitier';
-  if (s.includes('fromage')) return 'Fromages';
-  if (s.includes('boisson') || s.includes('juice') || s.includes('eau') || s.includes('soda')) return 'Boissons';
-  if (s.includes('charcuterie') || s.includes('jambon') || s.includes('saucisse')) return 'Charcuterie';
-  if (s.includes('surgel')) return 'Surgelés';
-  if (s.includes('fruit') || s.includes('legume') || s.includes('légume')) return 'Fruits & Légumes';
-  if (s.includes('cereale') || s.includes('céréale') || s.includes('petit-dejeuner') || s.includes('confiture')) return 'Petit-déj';
-  return 'Épicerie';
+  if(s.includes('lait')||s.includes('yaourt')||s.includes('yogurt')) return 'Frigo';
+  if(s.includes('fromage')) return 'Frigo';
+  if(s.includes('boisson')||s.includes('eau')||s.includes('soda')||s.includes('jus')) return 'Bebidas';
+  if(s.includes('charcuterie')||s.includes('jambon')||s.includes('saucisse')) return 'Carne/Charc';
+  if(s.includes('surgel')) return 'Congelados';
+  if(s.includes('fruit')||s.includes('legume')||s.includes('légume')) return 'Frutas/Legumes';
+  if(s.includes('cereale')||s.includes('confiture')||s.includes('petit-dejeuner')) return 'Pequeno Almoço';
+  if(s.includes('farine')||s.includes('sucre')||s.includes('epice')) return 'Especiarias/Bolos';
+  return 'Acompanhamentos';
 }
 
 function showScanResult() {
-  document.querySelectorAll('.toast').forEach(t => t.remove());
-  const el = document.getElementById('scan-result');
-  document.getElementById('res-name').textContent = pendingScan.name;
-  document.getElementById('res-cat').textContent = pendingScan.category + ' · ' + pendingScan.barcode;
-  el.classList.add('visible');
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  document.getElementById('sr-name').textContent = pendingScan.name;
+  document.getElementById('sr-info').textContent = pendingScan.barcode;
+  document.getElementById('sr-cat').value = pendingScan.cat;
+  document.getElementById('scan-result').classList.add('visible');
 }
 
 function confirmScan() {
-  if (!pendingScan) return;
-  addItem(pendingScan.name, pendingScan.category);
+  if(!pendingScan) return;
+  const mkt = parseInt(document.getElementById('sr-market').value);
+  const cat = document.getElementById('sr-cat').value;
+  const name = pendingScan.name;
+  lists[mkt].push({id:nextId++, name, cat, qty:1, done:false});
+  save();
+  if(mkt===activeMarket) renderList();
   dismissScan();
+  showToast(`✅ "${name}" → ${MARKETS_ARR[mkt]}`);
 }
 
 function dismissScan() {
@@ -423,113 +359,244 @@ function dismissScan() {
   document.getElementById('scan-result').classList.remove('visible');
 }
 
-// MANUAL
-function toggleManual() {
-  manualOpen = !manualOpen;
-  document.getElementById('manual-form').classList.toggle('visible', manualOpen);
-  document.getElementById('btn-manual').classList.toggle('active', manualOpen);
-}
-
-function addManual() {
-  const name = document.getElementById('manual-name').value.trim();
-  const cat = document.getElementById('manual-cat').value;
-  if (!name) return;
-  addItem(name, cat);
-  document.getElementById('manual-name').value = '';
-  document.getElementById('manual-cat').value = 'Autre';
-  toggleManual();
-}
-
-// LIST
-function addItem(name, category) {
-  if (lists[activeMarket].find(i => i.name === name)) {
-    showToast(`"${name}" déjà dans la liste`);
-    return;
-  }
-  lists[activeMarket].push({ id: Date.now(), name, category, done: false });
-  save();
+// ---- ADD MANUAL IN CAT ----
+function toggleAddCat(cat) {
+  openAddCat = openAddCat===cat ? null : cat;
   renderList();
-  showToast(`✅ "${name}" ajouté à ${MARKETS[activeMarket]}`);
+  if(openAddCat) {
+    setTimeout(()=>{
+      const inp = document.getElementById('add-input-'+CSS.escape(cat));
+      if(inp) inp.focus();
+    },100);
+  }
 }
 
-function toggleItem(id) {
-  const item = lists[activeMarket].find(i => i.id === id);
-  if (item) { item.done = !item.done; save(); renderList(); }
+function confirmAddCat(cat) {
+  const inp = document.getElementById('add-input-'+CSS.escape(cat));
+  const name = inp.value.trim();
+  if(!name) return;
+  lists[activeMarket].push({id:nextId++, name, cat, qty:1, done:false});
+  save();
+  openAddCat = null;
+  renderList();
+  showToast(`✅ "${name}" ajouté`);
 }
 
+// ---- MOVE ITEM ----
+function openMoveModal(id) {
+  moveItemId = id;
+  const item = lists[activeMarket].find(i=>i.id===id);
+  const modal = document.getElementById('move-modal');
+  const catsEl = document.getElementById('modal-cats');
+  catsEl.innerHTML = ALL_CATS.map(c => {
+    const color = CAT_COLORS[c]||'#94a3b8';
+    const current = item.cat===c;
+    return `<button class="modal-cat-btn" style="${current?`border-color:${color};color:${color}`:''}" onclick="moveItem('${c}')">
+      ${current?'✓ ':''}<span style="color:${color}">●</span> ${c}
+    </button>`;
+  }).join('');
+  modal.classList.add('visible');
+}
+
+function moveItem(cat) {
+  const item = lists[activeMarket].find(i=>i.id===moveItemId);
+  if(item) { item.cat = cat; save(); renderList(); }
+  closeModal();
+  showToast(`🔀 Déplacé vers ${cat}`);
+}
+
+function closeModal(e) {
+  if(e && e.target !== document.getElementById('move-modal')) return;
+  document.getElementById('move-modal').classList.remove('visible');
+  moveItemId = null;
+}
+
+// ---- DRAG & DROP (touch + mouse) ----
+let dragId = null;
+let dragOverId = null;
+
+function onDragStart(e, id) {
+  dragId = id;
+  setTimeout(()=>{ const el = document.getElementById('item-'+id); if(el) el.classList.add('dragging'); },0);
+  if(e.dataTransfer) e.dataTransfer.effectAllowed='move';
+}
+function onDragOver(e, id) {
+  e.preventDefault();
+  if(id===dragId) return;
+  document.querySelectorAll('.item').forEach(el=>el.classList.remove('drag-over'));
+  const el = document.getElementById('item-'+id);
+  if(el) el.classList.add('drag-over');
+  dragOverId = id;
+}
+function onDrop(e, id) {
+  e.preventDefault();
+  if(dragId===null||dragId===id) return;
+  const arr = lists[activeMarket];
+  const fromIdx = arr.findIndex(i=>i.id===dragId);
+  const toIdx = arr.findIndex(i=>i.id===id);
+  if(fromIdx<0||toIdx<0) return;
+  const [moved] = arr.splice(fromIdx,1);
+  // Also match category of drop target
+  moved.cat = arr[toIdx<fromIdx?toIdx:toIdx].cat;
+  arr.splice(toIdx<fromIdx?toIdx:toIdx,0,moved);
+  save(); dragId=null; dragOverId=null; renderList();
+}
+function onDragEnd() {
+  document.querySelectorAll('.item').forEach(el=>{ el.classList.remove('dragging'); el.classList.remove('drag-over'); });
+  dragId=null; dragOverId=null;
+}
+
+// Touch drag
+let touchDragId = null;
+let touchClone = null;
+let touchOffX = 0, touchOffY = 0;
+
+function onTouchStart(e, id) {
+  if(e.touches.length>1) return;
+  touchDragId = id;
+  const el = document.getElementById('item-'+id);
+  const rect = el.getBoundingClientRect();
+  touchOffX = e.touches[0].clientX - rect.left;
+  touchOffY = e.touches[0].clientY - rect.top;
+  touchClone = el.cloneNode(true);
+  touchClone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:0.8;z-index:9998;pointer-events:none;border:2px solid #6366f1;`;
+  document.body.appendChild(touchClone);
+  el.classList.add('dragging');
+}
+function onTouchMove(e) {
+  if(!touchDragId) return;
+  e.preventDefault();
+  const x = e.touches[0].clientX - touchOffX;
+  const y = e.touches[0].clientY - touchOffY;
+  if(touchClone) { touchClone.style.left=x+'px'; touchClone.style.top=y+'px'; }
+  // Find element under touch
+  touchClone.style.display='none';
+  const el = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+  touchClone.style.display='';
+  const itemEl = el && el.closest('.item');
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('drag-over'));
+  if(itemEl) { const overId = parseInt(itemEl.id.replace('item-','')); if(overId!==touchDragId) itemEl.classList.add('drag-over'); }
+}
+function onTouchEnd(e) {
+  if(!touchDragId) return;
+  if(touchClone) { touchClone.remove(); touchClone=null; }
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('dragging'));
+  const el = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+  const itemEl = el && el.closest('.item');
+  if(itemEl) {
+    const toId = parseInt(itemEl.id.replace('item-',''));
+    if(toId && toId!==touchDragId) {
+      const arr = lists[activeMarket];
+      const fromIdx = arr.findIndex(i=>i.id===touchDragId);
+      const toIdx = arr.findIndex(i=>i.id===toId);
+      if(fromIdx>=0&&toIdx>=0) {
+        const [moved] = arr.splice(fromIdx,1);
+        moved.cat = arr[toIdx<fromIdx?toIdx:toIdx].cat;
+        arr.splice(toIdx<fromIdx?toIdx:toIdx,0,moved);
+        save();
+      }
+    }
+  }
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('drag-over'));
+  touchDragId=null;
+  renderList();
+}
+
+// ---- ITEM ACTIONS ----
+function changeQty(id,delta) {
+  const item = lists[activeMarket].find(i=>i.id===id);
+  if(item) { item.qty=Math.max(0,item.qty+delta); save(); renderList(); }
+}
+function toggleDone(id) {
+  const item = lists[activeMarket].find(i=>i.id===id);
+  if(item) { item.done=!item.done; save(); renderList(); }
+}
 function deleteItem(id) {
-  lists[activeMarket] = lists[activeMarket].filter(i => i.id !== id);
+  lists[activeMarket] = lists[activeMarket].filter(i=>i.id!==id);
   save(); renderList();
 }
-
 function clearDone() {
-  const count = lists[activeMarket].filter(i => i.done).length;
-  lists[activeMarket] = lists[activeMarket].filter(i => !i.done);
+  const n = lists[activeMarket].filter(i=>i.done).length;
+  lists[activeMarket].forEach(i=>{ if(i.done) i.done=false; });
   save(); renderList();
-  if (count) showToast(`🗑️ ${count} article(s) supprimés`);
+  if(n) showToast(`✓ ${n} remis à zéro`);
+}
+function resetQtys() {
+  const def = DEFAULT_LISTS[activeMarket];
+  lists[activeMarket].forEach(item=>{ const d=def.find(x=>x.id===item.id); if(d){item.qty=d.qty;item.done=false;} });
+  save(); renderList();
+  showToast('↺ Quantités réinitialisées');
 }
 
+// ---- RENDER ----
 function renderList() {
-  // Counts
-  MARKETS.forEach((_, i) => {
-    document.getElementById(`count-${i}`).textContent = lists[i].length;
+  const current = lists[activeMarket];
+  const search = document.getElementById('search').value.toLowerCase();
+
+  const filtered = current.filter(i => !search || i.name.toLowerCase().includes(search));
+
+  // Group by cat preserving insertion order
+  const groups = {};
+  filtered.forEach(item => {
+    if(!groups[item.cat]) groups[item.cat]=[];
+    groups[item.cat].push(item);
   });
 
-  const current = lists[activeMarket];
-  const filtered = filterCat === "Tout" ? current : current.filter(i => i.category === filterCat);
-  const doneCount = current.filter(i => i.done).length;
+  // Stats
+  const active = current.filter(i=>i.qty>0&&!i.done).length;
+  const total = current.filter(i=>i.qty>0).length;
+  document.getElementById('bottom-active').textContent = active;
+  document.getElementById('bottom-total').textContent = total;
 
-  // Clear btn
-  document.getElementById('btn-clear').style.display = doneCount > 0 ? 'block' : 'none';
-
-  // Bottom bar
-  const bar = document.getElementById('bottom-bar');
-  bar.style.display = current.length > 0 ? 'flex' : 'none';
-  document.getElementById('bottom-done').textContent = doneCount;
-  document.getElementById('bottom-total').textContent = current.length;
-  document.getElementById('btn-clear-done').style.display = doneCount > 0 ? 'block' : 'none';
-
-  // Categories
-  const catsEl = document.getElementById('cats');
-  catsEl.innerHTML = CATEGORIES.map(c => {
-    const color = CAT_COLORS[c] || '#3b82f6';
-    const active = filterCat === c;
-    return `<button class="cat-btn${active?' active':''}" 
-      style="${active ? `background:${color};` : ''}"
-      onclick="setFilter('${c}')">${c}</button>`;
-  }).join('');
-
-  // List
   const listEl = document.getElementById('list');
-  if (filtered.length === 0) {
-    listEl.innerHTML = `<div class="empty">
-      <div class="empty-icon">🛒</div>
-      <div class="empty-title">Liste vide</div>
-      <div class="empty-sub">Scanner un article ou ajouter manuellement</div>
-    </div>`;
+  if(!filtered.length) {
+    listEl.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div style="font-weight:600;color:#475569">Aucun article</div></div>`;
     return;
   }
 
-  listEl.innerHTML = filtered.map(item => {
-    const color = CAT_COLORS[item.category] || '#94a3b8';
-    return `<div class="item${item.done?' done':''}">
-      <button class="check-btn${item.done?' checked':''}" onclick="toggleItem(${item.id})">
-        ${item.done ? '✓' : ''}
-      </button>
-      <div class="item-info">
-        <div class="item-name">${item.name}</div>
-        <div class="item-cat" style="color:${color}">${item.category}</div>
-      </div>
-      <button class="del-btn" onclick="deleteItem(${item.id})">×</button>
+  let html = '';
+  Object.entries(groups).forEach(([cat, items]) => {
+    const color = CAT_COLORS[cat]||'#94a3b8';
+    const isOpen = openAddCat===cat;
+    html += `<div class="section-header">
+      <span class="section-title" style="color:${color}">${cat}</span>
+      <button class="btn-add-cat" onclick="toggleAddCat('${cat.replace(/'/g,"\\'")}')">＋</button>
     </div>`;
-  }).join('');
+    html += `<div class="add-in-cat${isOpen?' visible':''}" id="add-form-${cat}">
+      <input id="add-input-${cat}" placeholder="Nom de l'article..." onkeydown="if(event.key==='Enter')confirmAddCat('${cat.replace(/'/g,"\\'")}')">
+      <button class="btn-add-confirm" onclick="confirmAddCat('${cat.replace(/'/g,"\\'")}')">OK</button>
+    </div>`;
+    items.forEach(item => {
+      html += `<div class="item${item.done?' done':''}${item.qty===0&&!item.done?' zero':''}" id="item-${item.id}"
+        draggable="true"
+        ondragstart="onDragStart(event,${item.id})"
+        ondragover="onDragOver(event,${item.id})"
+        ondrop="onDrop(event,${item.id})"
+        ondragend="onDragEnd()">
+        <span class="drag-handle"
+          ontouchstart="onTouchStart(event,${item.id})"
+          ontouchmove="onTouchMove(event)"
+          ontouchend="onTouchEnd(event)"
+          style="touch-action:none">⠿</span>
+        <button class="check-btn${item.done?' checked':''}" onclick="toggleDone(${item.id})">${item.done?'✓':''}</button>
+        <div class="item-info" onclick="openMoveModal(${item.id})">
+          <div class="item-name">${item.name}</div>
+          <div class="item-cat-badge" style="color:${color}">↔ changer catégorie</div>
+        </div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qty-num${item.qty===0?' zero':''}">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id},+1)">+</button>
+        </div>
+        <button class="del-btn" onclick="deleteItem(${item.id})">×</button>
+      </div>`;
+    });
+  });
+
+  listEl.innerHTML = html;
 }
 
-function setFilter(cat) {
-  filterCat = cat;
-  renderList();
-}
-
+document.addEventListener('touchmove', onTouchMove, {passive:false});
 renderList();
 </script>
 </body>
