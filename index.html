@@ -114,6 +114,24 @@ body { background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); font-family:'
 @keyframes fadeDown { from{opacity:0;transform:translateX(-50%) translateY(-10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 .empty { text-align:center; padding:50px 0; color:#334155; }
 .empty-icon { font-size:44px; margin-bottom:10px; }
+
+.cats-bar { display:flex; gap:7px; padding:12px 20px 4px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.cats-bar::-webkit-scrollbar { display:none; }
+.cat-chip { flex-shrink:0; padding:7px 13px; border-radius:20px; border:1.5px solid; background:transparent; font-family:'Sora',sans-serif; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.18s; opacity:0.55; }
+.cat-chip.active { opacity:1; }
+.cat-chip-add { flex-shrink:0; width:32px; height:32px; border-radius:50%; border:1.5px dashed #475569; background:transparent; color:#64748b; font-size:20px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.18s; line-height:1; }
+.cat-chip-add:hover { border-color:#94a3b8; color:#94a3b8; }
+.newcat-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:flex-end; justify-content:center; }
+.newcat-overlay.visible { display:flex; }
+.newcat-modal { background:#1e293b; border-radius:20px 20px 0 0; padding:24px 20px; width:100%; max-width:430px; }
+.newcat-title { font-weight:700; font-size:15px; margin-bottom:16px; }
+.newcat-input { width:100%; background:#0f172a; border:1px solid #334155; border-radius:12px; padding:13px 16px; color:white; font-size:14px; font-family:'Sora',sans-serif; outline:none; margin-bottom:12px; }
+.newcat-colors { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:16px; }
+.color-dot { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all 0.15s; }
+.color-dot.selected { border-color:white; transform:scale(1.15); }
+.newcat-btns { display:flex; gap:8px; }
+.btn-newcat-ok { flex:1; padding:12px; background:linear-gradient(135deg,#3b82f6,#6366f1); border:none; border-radius:12px; color:white; font-weight:700; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; }
+.btn-newcat-cancel { padding:12px 18px; background:#334155; border:none; border-radius:12px; color:#94a3b8; font-weight:600; font-size:13px; cursor:pointer; font-family:'Sora',sans-serif; }
 </style>
 </head>
 <body>
@@ -128,9 +146,12 @@ body { background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); font-family:'
   <button class="tab" onclick="switchMarket(1)">Colruyt</button>
 </div>
 
+<!-- CATEGORIES BAR -->
+<div class="cats-bar" id="cats-bar"></div>
+
 <div class="actions">
   <button class="btn btn-scan" id="btn-scan" onclick="toggleScan()">📷 Scanner</button>
-  <button class="btn btn-reset" onclick="resetQtys()">↺ Reset</button>
+  <button class="btn btn-reset" onclick="resetQtysToZero()">⬜ Remettre qtés à 0</button>
   <button class="btn btn-clear" onclick="clearDone()">🗑️</button>
 </div>
 
@@ -164,6 +185,19 @@ body { background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); font-family:'
 </div>
 
 <div class="list" id="list"></div>
+
+<!-- NEW CATEGORY MODAL -->
+<div class="newcat-overlay" id="newcat-modal">
+  <div class="newcat-modal">
+    <div class="newcat-title">➕ Nouvelle catégorie</div>
+    <input class="newcat-input" id="newcat-input" placeholder="Nom de la catégorie..." onkeydown="if(event.key==='Enter')confirmNewCat()">
+    <div class="newcat-colors" id="newcat-colors"></div>
+    <div class="newcat-btns">
+      <button class="btn-newcat-cancel" onclick="closeNewCat()">Annuler</button>
+      <button class="btn-newcat-ok" onclick="confirmNewCat()">Créer</button>
+    </div>
+  </div>
+</div>
 
 <!-- MOVE MODAL -->
 <div class="modal-overlay" id="move-modal" onclick="closeModal(event)">
@@ -254,6 +288,8 @@ function switchMarket(i) {
   document.getElementById('bottom-market').textContent = MARKETS_ARR[i];
   document.getElementById('search').value = '';
   openAddCat = null;
+  activeCatFilter = null;
+  renderCatsBar();
   renderList();
 }
 
@@ -521,19 +557,80 @@ function clearDone() {
   save(); renderList();
   if(n) showToast(`✓ ${n} remis à zéro`);
 }
-function resetQtys() {
-  const def = DEFAULT_LISTS[activeMarket];
-  lists[activeMarket].forEach(item=>{ const d=def.find(x=>x.id===item.id); if(d){item.qty=d.qty;item.done=false;} });
+function resetQtysToZero() {
+  lists[activeMarket].forEach(item=>{ item.qty=0; item.done=false; });
   save(); renderList();
-  showToast('↺ Quantités réinitialisées');
+  showToast('⬜ Quantités remises à 0');
 }
 
-// ---- RENDER ----
+// ---- NEW CATEGORY ----
+const EXTRA_COLORS = ['#fb7185','#f97316','#f59e0b','#86efac','#4ade80','#60a5fa','#a78bfa','#fcd34d','#67e8f9','#34d399','#94a3b8','#c084fc','#e879f9','#38bdf8','#f472b6','#a3e635'];
+let newCatColor = EXTRA_COLORS[5];
+
+function openNewCat() {
+  const el = document.getElementById('newcat-modal');
+  const colorsEl = document.getElementById('newcat-colors');
+  newCatColor = EXTRA_COLORS[5];
+  colorsEl.innerHTML = EXTRA_COLORS.map(c=>`<div class="color-dot${c===newCatColor?' selected':''}" style="background:${c}" onclick="selectNewCatColor('${c}')"></div>`).join('');
+  document.getElementById('newcat-input').value = '';
+  el.classList.add('visible');
+  setTimeout(()=>document.getElementById('newcat-input').focus(),100);
+}
+
+function selectNewCatColor(c) {
+  newCatColor = c;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('selected', d.style.background===c||d.style.backgroundColor===c));
+}
+
+function confirmNewCat() {
+  const name = document.getElementById('newcat-input').value.trim();
+  if(!name) return;
+  if(CAT_COLORS[name]) { showToast('Catégorie déjà existante','error'); return; }
+  CAT_COLORS[name] = newCatColor;
+  ALL_CATS.push(name);
+  closeNewCat();
+  renderCatsBar();
+  showToast(`✅ Catégorie "${name}" créée`);
+}
+
+function closeNewCat() {
+  document.getElementById('newcat-modal').classList.remove('visible');
+}
+
+// ---- CATS BAR ----
+let activeCatFilter = null;
+
+function renderCatsBar() {
+  const cats = [...new Set(lists[activeMarket].map(i=>i.cat))];
+  const bar = document.getElementById('cats-bar');
+  let html = '';
+  cats.forEach(cat => {
+    const color = CAT_COLORS[cat]||'#94a3b8';
+    const isActive = activeCatFilter===cat;
+    html += `<button class="cat-chip${isActive?' active':''}" style="color:${color};border-color:${color};${isActive?`background:${color}20`:''}" onclick="filterByCat('${cat.replace(/'/g,"\\'")}')">
+      ${cat}
+    </button>`;
+  });
+  html += `<button class="cat-chip-add" onclick="openNewCat()" title="Ajouter une catégorie">＋</button>`;
+  bar.innerHTML = html;
+}
+
+function filterByCat(cat) {
+  activeCatFilter = activeCatFilter===cat ? null : cat;
+  renderCatsBar();
+  renderList();
+}
+
+
 function renderList() {
   const current = lists[activeMarket];
   const search = document.getElementById('search').value.toLowerCase();
 
-  const filtered = current.filter(i => !search || i.name.toLowerCase().includes(search));
+  const filtered = current.filter(i => {
+    const matchSearch = !search || i.name.toLowerCase().includes(search);
+    const matchCat = !activeCatFilter || i.cat===activeCatFilter;
+    return matchSearch && matchCat;
+  });
 
   // Group by cat preserving insertion order
   const groups = {};
@@ -597,6 +694,7 @@ function renderList() {
 }
 
 document.addEventListener('touchmove', onTouchMove, {passive:false});
+renderCatsBar();
 renderList();
 </script>
 </body>
